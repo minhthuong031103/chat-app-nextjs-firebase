@@ -52,25 +52,41 @@ export default function Page() {
   const signInWithFacebook = async () => {
     try {
       await signInWithPopup(auth, facebookProvider);
-    } catch (error) {}
-  };
-  const resetPassword = async () => {
-    try {
-      toast.promise(
-        async () => {
-          //logic
-
-          await sendPasswordResetEmail(auth, email);
-        },
-        {
-          pending: 'Sending reset password email...',
-          success: 'Reset password email sent successfully',
-          error: 'Error sending reset password email',
-        },
-        { autoClose: 2000 }
-      );
     } catch (error) {
       console.log(error);
+    }
+  };
+  const resetPassword = async () => {
+    const toastId = toast.loading('Sending email...');
+    try {
+      //logic
+
+      const send = await sendPasswordResetEmail(auth, email);
+      toast.update(toastId, {
+        render: 'Email sent successfully',
+        type: 'success',
+        isLoading: false,
+        autoClose: 2000,
+      });
+    } catch (error) {
+      console.log(error.message);
+
+      if (error.message === 'Firebase: Error (auth/invalid-email).') {
+        toast.update(toastId, {
+          render: 'Invalid email',
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000,
+        });
+      }
+      if (error.message === 'Firebase: Error (auth/user-not-found).') {
+        toast.update(toastId, {
+          render: 'User not found',
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000,
+        });
+      }
     }
   };
   return isLoading || (!isLoading && currentUser) ? (
