@@ -3,7 +3,8 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { onAuthStateChanged, signOut as authSignOut } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { getDoc, doc } from 'firebase/firestore';
 const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -16,13 +17,14 @@ export const UserProvider = ({ children }) => {
     });
   };
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       //the second argument is a call back function that will be called when the state of the user changes
       setIsLoading(true);
       if (user) {
-        setCurrentUser(user);
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        console.log(userDoc.data());
+        setCurrentUser(userDoc.data());
         setIsLoading(false);
-        console.log(user);
       } else {
         setCurrentUser(null);
         setIsLoading(false);

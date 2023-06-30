@@ -10,6 +10,7 @@ import { db } from '../firebase/config';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { profileColors } from '../constant/color';
+import Loader from '../components/Loader';
 export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault(); //not reload page
@@ -51,7 +52,7 @@ export default function Register() {
   }, [currentUser, isLoading]);
 
   return isLoading || (!isLoading && currentUser) ? (
-    'Loading'
+    <Loader />
   ) : (
     <div className="h-[100vh] flex justify-center items-center bg-c1">
       <div className="flex items-center flex-col w-[600px]">

@@ -11,13 +11,15 @@ import {
   signInWithPopup,
   FacebookAuthProvider,
   sendPasswordResetEmail,
+  signInWithRedirect,
 } from 'firebase/auth';
 import { useAuth } from '../context/authContext';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
-export default function Page() {
+export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState();
   const { currentUser, isLoading } = useAuth();
@@ -44,7 +46,7 @@ export default function Page() {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const user = await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.log(error);
     }
@@ -90,7 +92,7 @@ export default function Page() {
     }
   };
   return isLoading || (!isLoading && currentUser) ? (
-    'Loading...'
+    <Loader />
   ) : (
     <div className="h-[100vh] flex justify-center items-center bg-c1">
       <ToastMessage />
