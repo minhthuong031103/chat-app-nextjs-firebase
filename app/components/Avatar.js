@@ -1,7 +1,6 @@
-import Image from 'next/image';
 import React from 'react';
-
-export default function Avatar({ size, user, onClick }) {
+import Image from 'next/image';
+const Avatar = ({ size, user, onClick }) => {
   const s =
     size === 'small'
       ? 32
@@ -33,15 +32,31 @@ export default function Avatar({ size, user, onClick }) {
 
   return (
     <div
-      className={`${c} rounded-full flex items-center
-  justify-center text-base shrink-0 relative
-  `}
+      className={`${c} rounded-full flex items-center justify-center text-base shrink-0 relative`}
       style={{ backgroundColor: user?.color }}
       onClick={onClick}
     >
+      {user?.isOnline && (
+        <>
+          {size === 'large' && (
+            <span className="w-[10px] h-[10px] bg-green-500 rounded-full absolute bottom-[2px] right-[2px]"></span>
+          )}
+
+          {size === 'x-large' && (
+            <span className="w-[12px] h-[12px] bg-green-500 rounded-full absolute bottom-[3px] right-[3px]"></span>
+          )}
+        </>
+      )}
+
       {user?.photoURL ? (
         <div className={`${c} overflow-hidden rounded-full`}>
-          <Image src={user.photoURL} alt="avatar" width={s} height={s} />
+          <Image
+            src={user?.photoURL}
+            alt="User Avatar"
+            className="rounded-full"
+            style={{ objectFit: 'cover' }}
+            fill
+          />
         </div>
       ) : (
         <div className={`uppercase font-semibold ${f}`}>
@@ -50,4 +65,6 @@ export default function Avatar({ size, user, onClick }) {
       )}
     </div>
   );
-}
+};
+
+export default Avatar;

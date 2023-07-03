@@ -15,10 +15,63 @@ import {
   MdPhoto,
   MdPhotoCamera,
 } from 'react-icons/md';
+import { storage } from '../firebase/config';
 import { profileColors } from '../constant/color';
+
 import { doc, updateDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 export default function LeftNav() {
+  var toastId = null;
+  const uploadImageToFireStore = (file) => {
+    try {
+      if (file) {
+        const storageRef = ref(storage, 'images');
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        toastId = toast.loading('Uploading...');
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused');
+                break;
+              case 'running':
+                console.log('Upload is running');
+                break;
+            }
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then(
+              async (downloadURL) => {
+                console.log('File available at', downloadURL);
+
+                handleUpdateProfile('photo', downloadURL);
+
+                await updateProfile(authUser, { photoURL: downloadURL });
+              }
+            );
+          }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const [editProfile, setEditProfile] = useState(false); // [1
   const { currentUser, signOut, setCurrentUser } = useAuth();
   const [nameEdited, setNameEdited] = useState(false);
@@ -42,8 +95,10 @@ export default function LeftNav() {
       default:
         break;
     }
+    if (type !== 'photo') {
+      toastId = toast.loading('Uploading...');
+    }
 
-    const toastId = toast.loading('Uploading...');
     try {
       //logic
       const currentUserDoc = doc(db, 'users', currentUser.uid);
@@ -110,7 +165,7 @@ export default function LeftNav() {
             setEditProfile(false);
           }}
         />
-        <div className="relative group cursor-pointer ">
+        <div className="relative rounded-full group cursor-pointer ">
           <Avatar size="xx-large" user={currentUser} />
           <div
             className="w-full h-full rounded-full bg-black/[0.5] 
@@ -120,15 +175,21 @@ export default function LeftNav() {
           >
             <label htmlFor="fileUpload">
               {currentUser.photoURL ? (
-                <MdPhotoCamera size={34} className="text-white" />
+                <MdPhotoCamera
+                  size={34}
+                  className="hover:cursor-pointer text-white"
+                />
               ) : (
-                <MdAddAPhoto size={34} className="text-white" />
+                <MdAddAPhoto
+                  size={34}
+                  className="hover:cursor-pointer text-white"
+                />
               )}
             </label>
             <input
               id="fileUpload"
+              onChange={(e) => uploadImageToFireStore(e.target.files[0])}
               type="file"
-              onChange={(e) => {}}
               style={{ display: 'none' }}
             />
           </div>
@@ -137,6 +198,9 @@ export default function LeftNav() {
               className="w-6 h-6 rounded-full bg-red-500 flex justify-center
           items-center absolute right-0 bottom-0
           "
+              onClick={() => {
+                handleUpdateProfile('photo-remove');
+              }}
             >
               <MdDeleteForever size={14} />
             </div>

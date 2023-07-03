@@ -4,13 +4,17 @@ import { createContext, useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { onAuthStateChanged, signOut as authSignOut } from 'firebase/auth';
 import { auth, db } from '../firebase/config';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
 const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const signOut = () => {
+  const signOut = async () => {
+    if (!currentUser) return;
+    await updateDoc(doc(db, 'users', currentUser.uid), {
+      isOnline: false,
+    });
     authSignOut(auth).then(function () {
       setCurrentUser(null);
       setIsLoading(false);
@@ -22,6 +26,11 @@ export const UserProvider = ({ children }) => {
       setIsLoading(true);
       if (user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          await updateDoc(doc(db, 'users', user.uid), {
+            isOnline: true,
+          });
+        }
         console.log(userDoc.data());
         setCurrentUser(userDoc.data());
         setIsLoading(false);

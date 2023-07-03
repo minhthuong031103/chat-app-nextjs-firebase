@@ -2,12 +2,7 @@
 const nextConfig = {};
 
 module.exports = {
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [{ key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' }],
-      },
-    ];
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
   },
 };
