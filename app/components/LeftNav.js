@@ -17,7 +17,7 @@ import {
 } from 'react-icons/md';
 import { storage } from '../firebase/config';
 import { profileColors } from '../constant/color';
-
+import UsersPopup from './popup/UsersPopup';
 import { doc, updateDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -72,6 +72,7 @@ export default function LeftNav() {
       console.log(error);
     }
   };
+  const [userPopup, setUserPopup] = useState(false); // [1
   const [editProfile, setEditProfile] = useState(false); // [1
   const { currentUser, signOut, setCurrentUser } = useAuth();
   const [nameEdited, setNameEdited] = useState(false);
@@ -259,56 +260,45 @@ cursor-pointer transition-transform hover:scale-125
   };
   return (
     <div
-      className={`${editProfile ? 'w-[350px]' : 'w-[80px] items-center'}  
-      flex flex-col justify-between
-    py-5 shrink-0 transition-all
-  `}
+      className={`${
+        editProfile ? 'w-[350px]' : 'w-[80px] items-center'
+      } flex flex-col justify-between py-5 shrink-0 transition-all`}
     >
       {editProfile ? (
         editProfileContainer()
       ) : (
-        <>
-          <div
-            className="relative group cursor-pointer
-          
-          "
-            onClick={() => {
-              setEditProfile(true);
-            }}
-          >
-            <Avatar size="large" user={currentUser} />
-
-            <div
-              className="w-full h-full rounded-full 
-bg-black/[0.5] absolute top-0 left-0
-justify-center items-center hidden
-group-hover:flex
-"
-            >
-              <BiEdit size={24} className="" />
-            </div>
+        <div
+          className="relative group cursor-pointer"
+          onClick={() => setEditProfile(true)}
+        >
+          <Avatar size="large" user={currentUser} />
+          <div className="w-full h-full rounded-full bg-black/[0.5] absolute top-0 left-0 justify-center items-center hidden group-hover:flex">
+            <BiEdit size={14} />
           </div>
-        </>
+        </div>
       )}
 
       <div
-        className={`flex gap-5 
-      ${editProfile ? 'ml-5' : 'flex-col items-center'}
-      `}
+        className={`flex gap-5 ${
+          editProfile ? 'ml-5' : 'flex-col items-center'
+        }`}
       >
         <Icon
           size="x-large"
-          className="bg-green-500 hover:bg-gray-600 "
+          className="bg-green-500 hover:bg-gray-600"
           icon={<FiPlus size={24} />}
-          onClick={() => {}}
+          onClick={() => setUserPopup(!userPopup)}
         />
         <Icon
           size="x-large"
-          className="hover:bg-c2 "
+          className="hover:bg-c2"
           icon={<IoLogOutOutline size={24} />}
           onClick={signOut}
         />
       </div>
+      {userPopup && (
+        <UsersPopup onHide={() => setUserPopup(false)} title="Find Users" />
+      )}
     </div>
   );
 }

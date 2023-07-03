@@ -39,11 +39,11 @@ const Avatar = ({ size, user, onClick }) => {
       {user?.isOnline && (
         <>
           {size === 'large' && (
-            <span className="w-[10px] h-[10px] bg-green-500 rounded-full absolute bottom-[2px] right-[2px]"></span>
+            <span className="z-10 w-[10px] h-[10px] bg-green-500 rounded-full absolute bottom-[2px] right-[2px]"></span>
           )}
 
           {size === 'x-large' && (
-            <span className="w-[12px] h-[12px] bg-green-500 rounded-full absolute bottom-[3px] right-[3px]"></span>
+            <span className="z-10 w-[12px] h-[12px] bg-green-500 rounded-full absolute bottom-[3px] right-[3px]"></span>
           )}
         </>
       )}
@@ -53,7 +53,7 @@ const Avatar = ({ size, user, onClick }) => {
           <Image
             src={user?.photoURL}
             alt="User Avatar"
-            className="rounded-full"
+            className="rounded-full z-0"
             style={{ objectFit: 'cover' }}
             fill
           />
