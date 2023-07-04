@@ -17,25 +17,23 @@ export default function Page() {
   return isLoading || !currentUser ? (
     <Loader />
   ) : (
-    <>
-      <div className="bg-c1 flex h-[100vh]">
-        <div className="flex w-full shrink-0">
-          <LeftNav />
+    <div className="bg-c1 flex h-[100vh]">
+      <div className="flex w-full shrink-0">
+        <LeftNav />
 
-          <div className="flex bg-c2 grow">
-            <div
-              className="w-[400px] p-5 overflow-auto
+        <div className="flex bg-c2 grow">
+          <div
+            className="w-[400px] p-5 overflow-auto
             scrollbar shrink-0 border-r border-white/[0.05]
             "
-            >
-              <div className="flex flex-col h-full">
-                <Chats />
-              </div>
+          >
+            <div className="flex flex-col h-full">
+              <Chats />
             </div>
-            <div>chat</div>
           </div>
+          <div>chat</div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

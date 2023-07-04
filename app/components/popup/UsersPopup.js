@@ -13,6 +13,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/app/firebase/config';
+import Search from '../Search';
 
 export default function UsersPopup(props) {
   const { currentUser } = useAuth();
@@ -28,7 +29,7 @@ export default function UsersPopup(props) {
       if (!res.exists()) {
         //not exist
         await setDoc(doc(db, 'chats', combinedId), {
-          messages: [],
+          messages: [], //set combinedId chats null
         });
         const currentUserChatRef = await getDoc(
           doc(db, 'userChats', currentUser.uid)
@@ -61,6 +62,7 @@ export default function UsersPopup(props) {
 
   return (
     <PopupWrapper {...props}>
+      <Search />
       <div
         className="mt-5 flex flex-col gap-2 
   grow relative overflow-auto scrollbar
